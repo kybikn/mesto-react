@@ -1,5 +1,22 @@
 import avatarImage from '../images/Kusto.jpg';
+import React from 'react';
+import api from '../utils/api.js';
+
 function Main({ onEditAvatar, onEditProfile, onAddPlace }) {
+  const [userName, setUserName] = React.useState('Жак-Ив Кусто');
+  const [userDescription, setUserDescription] = React.useState(
+    'Исследователь океана'
+  );
+  const [userAvatar, setUserAvatar] = React.useState(avatarImage);
+
+  React.useEffect(() => {
+    api.getProfile().then((profile) => {
+      setUserName(profile.name);
+      setUserDescription(profile.about);
+      setUserAvatar(profile.avatar);
+    });
+  }, []);
+
   return (
     <main>
       <section className='profile'>
@@ -14,20 +31,20 @@ function Main({ onEditAvatar, onEditProfile, onAddPlace }) {
             ></button>
             <img
               className='profile__img profile__avatar-img'
-              src={avatarImage}
+              src={userAvatar}
               alt='Аватар'
             />
           </div>
           <div className='profile__text'>
             <div className='profile__name'>
-              <h1 className='profile__title'>Жак-Ив Кусто</h1>
+              <h1 className='profile__title'>{userName}</h1>
               <button
                 onClick={onEditProfile}
                 className='button profile__button-edit'
                 type='button'
               ></button>
             </div>
-            <p className='profile__subtitle'>Исследователь океана</p>
+            <p className='profile__subtitle'>{userDescription}</p>
           </div>
           <button
             onClick={onAddPlace}
