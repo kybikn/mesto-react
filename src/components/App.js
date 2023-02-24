@@ -28,10 +28,16 @@ function App() {
     // popupPlace.classList.add('popup_active');
     setAddPlacePopupOpen(true);
   }
-  function closeAllPopups() {
-    setEditAvatarPopupOpen(false);
-    setEditProfilePopupOpen(false);
-    setAddPlacePopupOpen(false);
+  function closeAllPopups(event) {
+    if (
+      event.target.classList.contains('popup_active') ||
+      event.target.classList.contains('popup__close')
+    ) {
+      setAddPlacePopupOpen(false);
+      setEditProfilePopupOpen(false);
+      setEditAvatarPopupOpen(false);
+      setEditProfilePopupOpen(false);
+    }
   }
   return (
     <div className='page'>
@@ -40,13 +46,13 @@ function App() {
         onEditAvatar={handleEditAvatarClick}
         onEditProfile={handleEditProfileClick}
         onAddPlace={handleAddPlaceClick}
-        onClose={closeAllPopups}
       />
       <Footer />
       <PopupWithForm
         name='profile'
         title='Редактировать профиль'
         isOpen={isEditProfilePopupOpen}
+        onClose={closeAllPopups}
       >
         <fieldset className='popup__box'>
           <label className='popup__label'>
@@ -95,6 +101,7 @@ function App() {
         name='place'
         title='Новое место'
         isOpen={isAddPlacePopupOpen}
+        onClose={closeAllPopups}
       >
         <fieldset className='popup__box'>
           <label className='popup__label'>
@@ -141,6 +148,7 @@ function App() {
         name='avatar'
         title='Обновить аватар'
         isOpen={isEditAvatarPopupOpen}
+        onClose={closeAllPopups}
       >
         <fieldset className='popup__box'>
           <label className='popup__label'>
@@ -171,6 +179,7 @@ function App() {
         name='delete'
         title='Вы уверены?'
         isOpen={isDeletePopupOpen}
+        onClose={closeAllPopups}
       >
         <button
           className='popup__button'
