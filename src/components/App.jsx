@@ -13,19 +13,12 @@ function App() {
   const [isDeletePopupOpen, setDeletePopupOpen] = React.useState(false);
 
   function handleEditAvatarClick() {
-    // console.log('Аватар кликнут');
-    // const popupPlace = document.querySelector('.popup_type_avatar');
-    // popupPlace.classList.add('popup_active');
     setEditAvatarPopupOpen(true);
   }
   function handleEditProfileClick() {
-    // const popupPlace = document.querySelector('.popup_type_profile');
-    // popupPlace.classList.add('popup_active');
     setEditProfilePopupOpen(true);
   }
   function handleAddPlaceClick() {
-    // const popupPlace = document.querySelector('.popup_type_place');
-    // popupPlace.classList.add('popup_active');
     setAddPlacePopupOpen(true);
   }
   function closeAllPopups(event) {
