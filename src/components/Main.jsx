@@ -1,21 +1,44 @@
 import avatarImage from '../images/Kusto.jpg';
 import React from 'react';
 import api from '../utils/api.js';
+import Card from './Card';
+import enrichCardData from '../utils/utils.js'
 
-function Main({ onEditAvatar, onEditProfile, onAddPlace }) {
+function Main({ onEditAvatar, onEditProfile, onAddPlace, onCardClick }) {
   const [userName, setUserName] = React.useState('Жак-Ив Кусто');
   const [userDescription, setUserDescription] = React.useState(
     'Исследователь океана'
   );
   const [userAvatar, setUserAvatar] = React.useState(avatarImage);
+  const [cards, setCards] = React.useState([]);
 
   React.useEffect(() => {
-    api.getProfile().then((profile) => {
-      setUserName(profile.name);
-      setUserDescription(profile.about);
-      setUserAvatar(profile.avatar);
-    });
+
+    Promise.all([api.getProfile(), api.getInitialCards()])
+      // тут деструктурируем ответ от сервера (api.getProfile() => profile, api.getInitialCards() => initialCards)
+      .then(([profile, initialCards]) => {
+        // установка состояния профиля и перерисовка, соответственно
+        setUserName(profile.name);
+        setUserDescription(profile.about);
+        setUserAvatar(profile.avatar);
+
+        // обогащение данных карточек
+        const enrichedInitialCards = initialCards.map((cardData) =>
+          enrichCardData(cardData, profile._id)
+        );
+        // установка состояния карточек и перерисовка, соответственно
+        setCards(enrichedInitialCards);
+
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+
   }, []);
+
+  const galleryList = cards.map((card) =>
+    <Card key={card._id} card={card} onCardClick={onCardClick} />
+  );
 
   return (
     <main>
@@ -57,7 +80,9 @@ function Main({ onEditAvatar, onEditProfile, onAddPlace }) {
         className='gallery'
         aria-label='Галерея карточек'
       >
-        <ul className='gallery__list'></ul>
+        <ul className='gallery__list'>
+          {galleryList}
+        </ul>
       </section>
     </main>
   );

@@ -10,7 +10,9 @@ function App() {
     React.useState(false);
   const [isAddPlacePopupOpen, setAddPlacePopupOpen] = React.useState(false);
   const [isEditAvatarPopupOpen, setEditAvatarPopupOpen] = React.useState(false);
-  const [isDeletePopupOpen, setDeletePopupOpen] = React.useState(false);
+  // const [isDeletePopupOpen, setDeletePopupOpen] = React.useState(false);
+  const [selectedCard, setSelectedCard] = React.useState(null);
+
 
   function handleEditAvatarClick() {
     setEditAvatarPopupOpen(true);
@@ -21,6 +23,11 @@ function App() {
   function handleAddPlaceClick() {
     setAddPlacePopupOpen(true);
   }
+
+  function handleCardClick(card) {
+    setSelectedCard(card);
+  }
+
   function closeAllPopups(event) {
     if (
       event.target.classList.contains('popup_active') ||
@@ -30,6 +37,7 @@ function App() {
       setEditProfilePopupOpen(false);
       setEditAvatarPopupOpen(false);
       setEditProfilePopupOpen(false);
+      setSelectedCard(null);
     }
   }
   return (
@@ -39,6 +47,7 @@ function App() {
         onEditAvatar={handleEditAvatarClick}
         onEditProfile={handleEditProfileClick}
         onAddPlace={handleAddPlaceClick}
+        onCardClick={handleCardClick}
       />
       <Footer />
       <PopupWithForm
@@ -171,7 +180,7 @@ function App() {
       <PopupWithForm
         name='delete'
         title='Вы уверены?'
-        isOpen={isDeletePopupOpen}
+        // isOpen={isDeletePopupOpen}
         onClose={closeAllPopups}
       >
         <button
@@ -183,26 +192,9 @@ function App() {
         </button>
       </PopupWithForm>
 
-      <ImagePopup />
+      <ImagePopup card={selectedCard} onClose={closeAllPopups} />
 
-      <template id='card'>
-        <li>
-          <figure className='card'>
-            <img className='card__img' />
-            <button className='button card__button-remove'></button>
-            <figcaption className='card__description'>
-              <h2 className='card__title'></h2>
-              <div>
-                <button
-                  className='button card__button-like'
-                  type='button'
-                ></button>
-                <div className='card__num-likes'>0</div>
-              </div>
-            </figcaption>
-          </figure>
-        </li>
-      </template>
+
     </div>
   );
 }
