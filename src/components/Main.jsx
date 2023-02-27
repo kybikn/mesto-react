@@ -1,18 +1,18 @@
 import avatarImage from '../images/Kusto.jpg';
-import React from 'react';
+import { useState, useEffect } from 'react';
 import api from '../utils/api.js';
 import Card from './Card';
 import enrichCardData from '../utils/utils.js'
 
 function Main({ onEditAvatar, onEditProfile, onAddPlace, onCardClick }) {
-  const [userName, setUserName] = React.useState('Жак-Ив Кусто');
-  const [userDescription, setUserDescription] = React.useState(
+  const [userName, setUserName] = useState('Жак-Ив Кусто');
+  const [userDescription, setUserDescription] = useState(
     'Исследователь океана'
   );
-  const [userAvatar, setUserAvatar] = React.useState(avatarImage);
-  const [cards, setCards] = React.useState([]);
+  const [userAvatar, setUserAvatar] = useState(avatarImage);
+  const [cards, setCards] = useState([]);
 
-  React.useEffect(() => {
+  useEffect(() => {
 
     Promise.all([api.getProfile(), api.getInitialCards()])
       // тут деструктурируем ответ от сервера (api.getProfile() => profile, api.getInitialCards() => initialCards)
