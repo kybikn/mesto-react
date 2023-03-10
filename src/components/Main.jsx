@@ -13,14 +13,13 @@ function Main({ onEditAvatar, onEditProfile, onAddPlace, onCardClick }) {
   const [cards, setCards] = useState([]);
 
   useEffect(() => {
-
     Promise.all([api.getProfile(), api.getInitialCards()])
       // тут деструктурируем ответ от сервера (api.getProfile() => profile, api.getInitialCards() => initialCards)
       .then(([profile, initialCards]) => {
         // установка состояния профиля и перерисовка, соответственно
+        setUserAvatar(profile.avatar);
         setUserName(profile.name);
         setUserDescription(profile.about);
-        setUserAvatar(profile.avatar);
 
         // обогащение данных карточек
         const enrichedInitialCards = initialCards.map((cardData) =>
@@ -28,16 +27,17 @@ function Main({ onEditAvatar, onEditProfile, onAddPlace, onCardClick }) {
         );
         // установка состояния карточек и перерисовка, соответственно
         setCards(enrichedInitialCards);
-
       })
       .catch((err) => {
         console.log(err);
       });
-
   }, []);
 
   const galleryList = cards.map((card) =>
-    <Card key={card._id} card={card} onCardClick={onCardClick} />
+    <Card
+      key={card._id}
+      card={card}
+      onCardClick={onCardClick} />
   );
 
   return (
