@@ -92,11 +92,19 @@ class Api {
   // удаление лайка
   deleteLike(cardId) {
     const likeCardsUrl = `${this._cardsUrl}/${cardId}/likes`;
-    console.log('likeCardsUrl:', likeCardsUrl);
     return fetch(likeCardsUrl, {
       headers: this._headers,
       method: 'DELETE',
     }).then(this._handleResponse);
+  }
+
+  // изменение статуса лайка на требуемый
+  changeLikeCardStatus(cardId, like) {
+    if (like) {
+      return this.addLike(cardId);
+    } else {
+      return this.deleteLike(cardId);
+    }
   }
 }
 

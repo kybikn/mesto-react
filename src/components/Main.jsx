@@ -1,43 +1,53 @@
-import avatarImage from '../images/Kusto.jpg';
-import { useState, useEffect } from 'react';
+
+import { useState, useEffect, useContext } from 'react';
 import api from '../utils/api.js';
 import Card from './Card';
-import enrichCardData from '../utils/utils.js'
+import { CurrentUserContext } from '../contexts/CurrentUserContext';
 
 function Main({ onEditAvatar, onEditProfile, onAddPlace, onCardClick }) {
-  const [userName, setUserName] = useState('Жак-Ив Кусто');
-  const [userDescription, setUserDescription] = useState(
-    'Исследователь океана'
-  );
-  const [userAvatar, setUserAvatar] = useState(avatarImage);
   const [cards, setCards] = useState([]);
+  const currentUser = useContext(CurrentUserContext);
 
   useEffect(() => {
-    Promise.all([api.getProfile(), api.getInitialCards()])
-      // тут деструктурируем ответ от сервера (api.getProfile() => profile, api.getInitialCards() => initialCards)
-      .then(([profile, initialCards]) => {
-        // установка состояния профиля и перерисовка, соответственно
-        setUserAvatar(profile.avatar);
-        setUserName(profile.name);
-        setUserDescription(profile.about);
-
-        // обогащение данных карточек
-        const enrichedInitialCards = initialCards.map((cardData) =>
-          enrichCardData(cardData, profile._id)
-        );
+    api.getInitialCards()
+      .then((initialCards) => {
         // установка состояния карточек и перерисовка, соответственно
-        setCards(enrichedInitialCards);
+        setCards(initialCards);
       })
       .catch((err) => {
         console.log(err);
       });
   }, []);
 
+  function handleCardLike(card) {
+    // Снова проверяем, есть ли уже лайк на этой карточке
+    const isLiked = card.likes.some(i => i._id === currentUser._id);
+    // Отправляем запрос в API и получаем обновлённые данные карточки
+    // api.changeLikeCardStatus(card._id, !isLiked).then((newCard) => {
+    //   setCards((state) => state.map((stateCard) => stateCard._id === card._id ? newCard : stateCard));
+    // });
+    api.changeLikeCardStatus(card._id, !isLiked).then((newCard) => {
+      // setCards((cardsState) => cardsState.map((stateCard) => stateCard._id === card._id ? newCard : stateCard));
+      const newCards = cards.map(stateCard => stateCard._id === card._id ? newCard : stateCard)
+      setCards(newCards)
+    });
+  }
+
+  function handleCardDelete(card) {
+    api.deleteCard(card._id).then(() => {
+      // setCards((cardsState) => cardsState.filter((stateCard) => stateCard._id !== card._id));
+      const newCards = cards.filter((stateCard) => stateCard._id !== card._id);
+      setCards(newCards)
+    });
+  }
+
   const galleryList = cards.map((card) =>
     <Card
       key={card._id}
       card={card}
-      onCardClick={onCardClick} />
+      onCardClick={onCardClick}
+      onCardLike={handleCardLike}
+      onCardDelete={handleCardDelete} />
   );
 
   return (
@@ -54,20 +64,20 @@ function Main({ onEditAvatar, onEditProfile, onAddPlace, onCardClick }) {
             ></button>
             <img
               className='profile__img profile__avatar-img'
-              src={userAvatar}
+              src={currentUser.avatar}
               alt='Аватар'
             />
           </div>
           <div className='profile__text'>
             <div className='profile__name'>
-              <h1 className='profile__title'>{userName}</h1>
+              <h1 className='profile__title'>{currentUser.name}</h1>
               <button
                 onClick={onEditProfile}
                 className='button profile__button-edit'
                 type='button'
               ></button>
             </div>
-            <p className='profile__subtitle'>{userDescription}</p>
+            <p className='profile__subtitle'>{currentUser.about}</p>
           </div>
           <button
             onClick={onAddPlace}
