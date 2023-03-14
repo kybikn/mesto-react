@@ -4,50 +4,17 @@ import api from '../utils/api.js';
 import Card from './Card';
 import { CurrentUserContext } from '../contexts/CurrentUserContext';
 
-function Main({ onEditAvatar, onEditProfile, onAddPlace, onCardClick }) {
-  const [cards, setCards] = useState([]);
+function Main({ onEditAvatar, onEditProfile, onAddPlace, onCardClick, cards, onCardLike, onCardDelete }) {
+
   const currentUser = useContext(CurrentUserContext);
-
-  useEffect(() => {
-    api.getInitialCards()
-      .then((initialCards) => {
-        // установка состояния карточек и перерисовка, соответственно
-        setCards(initialCards);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-  }, []);
-
-  function handleCardLike(card) {
-    // Снова проверяем, есть ли уже лайк на этой карточке
-    const isLiked = card.likes.some(i => i._id === currentUser._id);
-    // Отправляем запрос в API и получаем обновлённые данные карточки
-    // api.changeLikeCardStatus(card._id, !isLiked).then((newCard) => {
-    //   setCards((state) => state.map((stateCard) => stateCard._id === card._id ? newCard : stateCard));
-    // });
-    api.changeLikeCardStatus(card._id, !isLiked).then((newCard) => {
-      // setCards((cardsState) => cardsState.map((stateCard) => stateCard._id === card._id ? newCard : stateCard));
-      const newCards = cards.map(stateCard => stateCard._id === card._id ? newCard : stateCard)
-      setCards(newCards)
-    });
-  }
-
-  function handleCardDelete(card) {
-    api.deleteCard(card._id).then(() => {
-      // setCards((cardsState) => cardsState.filter((stateCard) => stateCard._id !== card._id));
-      const newCards = cards.filter((stateCard) => stateCard._id !== card._id);
-      setCards(newCards)
-    });
-  }
 
   const galleryList = cards.map((card) =>
     <Card
       key={card._id}
       card={card}
       onCardClick={onCardClick}
-      onCardLike={handleCardLike}
-      onCardDelete={handleCardDelete} />
+      onCardLike={onCardLike}
+      onCardDelete={onCardDelete} />
   );
 
   return (

@@ -18,7 +18,7 @@ function App() {
   // const [isDeletePopupOpen, setDeletePopupOpen] = useState(false);
   const [selectedCard, setSelectedCard] = useState(null);
   const [currentUser, setCurrentUser] = useState({ avatar: avatarImage, name: 'Жак-Ив Кусто', about: 'Исследователь океана' });
-
+  const [cards, setCards] = useState([]);
 
   function handleEditAvatarClick() {
     setEditAvatarPopupOpen(true);
@@ -47,15 +47,18 @@ function App() {
   }
 
   useEffect(() => {
-    api.getProfile()
-      .then((profile) => {
+    Promise.all([api.getProfile(), api.getInitialCards()])
+      .then(([profile, initialCards]) => {
         // установка состояния профиля
-        setCurrentUser(profile)
+        setCurrentUser(profile);
+        // установка состояния карточек 
+        setCards(initialCards);
       })
       .catch((err) => {
         console.log(err);
       });
   }, []);
+
 
   function handleUpdateAvatar(link) {
     api.editAvatar(link)
@@ -67,6 +70,29 @@ function App() {
       .catch((err) => {
         console.log(err);
       });
+  }
+
+
+  function handleCardLike(card) {
+    // Снова проверяем, есть ли уже лайк на этой карточке
+    const isLiked = card.likes.some(i => i._id === currentUser._id);
+    // Отправляем запрос в API и получаем обновлённые данные карточки
+    // api.changeLikeCardStatus(card._id, !isLiked).then((newCard) => {
+    //   setCards((state) => state.map((stateCard) => stateCard._id === card._id ? newCard : stateCard));
+    // });
+    api.changeLikeCardStatus(card._id, !isLiked).then((newCard) => {
+      // setCards((cardsState) => cardsState.map((stateCard) => stateCard._id === card._id ? newCard : stateCard));
+      const newCards = cards.map(stateCard => stateCard._id === card._id ? newCard : stateCard)
+      setCards(newCards)
+    });
+  }
+
+  function handleCardDelete(card) {
+    api.deleteCard(card._id).then(() => {
+      // setCards((cardsState) => cardsState.filter((stateCard) => stateCard._id !== card._id));
+      const newCards = cards.filter((stateCard) => stateCard._id !== card._id);
+      setCards(newCards)
+    });
   }
 
   function hardCloseAllPopups() {
@@ -96,6 +122,9 @@ function App() {
           onEditProfile={handleEditProfileClick}
           onAddPlace={handleAddPlaceClick}
           onCardClick={handleCardClick}
+          cards={cards}
+          onCardLike={handleCardLike}
+          onCardDelete={handleCardDelete}
         />
         <Footer />
         <EditAvatarPopup
