@@ -36,13 +36,13 @@ class Api {
   }
 
   // редактирование профиля пользователя
-  editProfile({ userName, userJob }) {
+  editProfile({ name, about }) {
     return fetch(this._profileUrl, {
       headers: this._headers,
       method: 'PATCH',
       body: JSON.stringify({
-        name: userName,
-        about: userJob,
+        name,
+        about,
       }),
     }).then(this._handleResponse);
   }

@@ -7,6 +7,7 @@ import { useEffect, useState } from 'react';
 import api from '../utils/api.js';
 import { CurrentUserContext } from '../contexts/CurrentUserContext';
 import avatarImage from '../images/Kusto.jpg';
+import EditProfilePopup from './EditProfilePopup';
 
 function App() {
   const [isAddPlacePopupOpen, setAddPlacePopupOpen] = useState(false);
@@ -32,6 +33,18 @@ function App() {
     setSelectedCard(card);
   }
 
+  function handleUpdateUser({ name, about }) {
+    api.editProfile({ name, about })
+      .then((profile) => {
+        // установка состояния профиля
+        setCurrentUser(profile);
+        hardCloseAllPopups();
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }
+
   useEffect(() => {
     api.getProfile()
       .then((profile) => {
@@ -43,7 +56,12 @@ function App() {
       });
   }, []);
 
-
+  function hardCloseAllPopups() {
+    setEditAvatarPopupOpen(false);
+    setEditProfilePopupOpen(false);
+    setAddPlacePopupOpen(false);
+    setSelectedCard(null);
+  }
 
   function closeAllPopups(event) {
     if (
@@ -89,46 +107,11 @@ function App() {
             <span className='popup__input-error popup__input-avatar-error'></span>
           </label>
         </PopupWithForm>
-        <PopupWithForm
-          name='profile'
-          title='Редактировать профиль'
-          btnText='Сохранить'
+        <EditProfilePopup
           isOpen={isEditProfilePopupOpen}
           onClose={closeAllPopups}
-        >
-          <label className='popup__label'>
-            <span className='popup__input-close popup__input-name-close'>
-              &times;
-            </span>
-            <input
-              className='popup__input popup__input_type_name'
-              id='popup__input-name'
-              type='text'
-              name='name'
-              placeholder='Ваше имя'
-              minLength='2'
-              maxLength='40'
-              required
-            />
-            <span className='popup__input-error popup__input-name-error'></span>
-          </label>
-          <label className='popup__label'>
-            <span className='popup__input-close popup__input-job-close'>
-              &times;
-            </span>
-            <input
-              className='popup__input popup__input_type_job'
-              id='popup__input-job'
-              type='text'
-              name='job'
-              placeholder='Ваша профессия'
-              minLength='2'
-              maxLength='200'
-              required
-            />
-            <span className='popup__input-error popup__input-job-error'></span>
-          </label>
-        </PopupWithForm>
+          onUpdateUser={handleUpdateUser}
+        />
         <PopupWithForm
           name='place'
           title='Новое место'
