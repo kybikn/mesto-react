@@ -10,10 +10,8 @@ function AddPlacePopup({ isOpen, onClose, onAddPlace }) {
             name: inputNameRef.current.value,
             link: inputLinkrRef.current.value
         });
+        e.target.reset();
     }
-
-    inputNameRef.current.value = '';
-    inputLinkrRef.current.value = '';
 
     return (
         <PopupWithForm
