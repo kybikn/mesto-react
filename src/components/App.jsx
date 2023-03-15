@@ -1,7 +1,7 @@
 import Header from './Header';
 import Main from './Main';
 import Footer from './Footer';
-import PopupWithForm from './PopupWithForm';
+// import PopupWithForm from './PopupWithForm';
 import ImagePopup from './ImagePopup';
 import { useEffect, useState } from 'react';
 import api from '../utils/api.js';
@@ -10,16 +10,19 @@ import avatarImage from '../images/Kusto.jpg';
 import EditProfilePopup from './EditProfilePopup';
 import EditAvatarPopup from './EditAvatarPopup';
 import AddPlacePopup from './AddPlacePopup';
+import EditDeletePopup from './EditDeletePopup';
+
 
 function App() {
   const [isAddPlacePopupOpen, setAddPlacePopupOpen] = useState(false);
   const [isEditAvatarPopupOpen, setEditAvatarPopupOpen] = useState(false);
   const [isEditProfilePopupOpen, setEditProfilePopupOpen] =
     useState(false);
-  // const [isDeletePopupOpen, setDeletePopupOpen] = useState(false);
+  const [isDeletePopupOpen, setDeletePopupOpen] = useState(false);
   const [selectedCard, setSelectedCard] = useState(null);
   const [currentUser, setCurrentUser] = useState({ avatar: avatarImage, name: 'Жак-Ив Кусто', about: 'Исследователь океана' });
   const [cards, setCards] = useState([]);
+  const [cardToDelete, setCardToDelete] = useState(null);
 
   function handleEditAvatarClick() {
     setEditAvatarPopupOpen(true);
@@ -30,7 +33,10 @@ function App() {
   function handleAddPlaceClick() {
     setAddPlacePopupOpen(true);
   }
-
+  function handleDeletePopupClick(card) {
+    setCardToDelete(card)
+    setDeletePopupOpen(true);
+  }
   function handleCardClick(card) {
     setSelectedCard(card);
   }
@@ -40,10 +46,12 @@ function App() {
       .then((profile) => {
         // установка состояния профиля
         setCurrentUser(profile);
-        hardCloseAllPopups();
       })
       .catch((err) => {
         console.log(err);
+        alert(`Ошибка: ${err}`);
+      }).finally(() => {
+        hardCloseAllPopups();
       });
   }
 
@@ -52,10 +60,12 @@ function App() {
       .then((profile) => {
         // установка состояния профиля
         setCurrentUser(profile);
-        hardCloseAllPopups();
       })
       .catch((err) => {
         console.log(err);
+        alert(`Ошибка: ${err}`);
+      }).finally(() => {
+        hardCloseAllPopups();
       });
   }
 
@@ -64,11 +74,26 @@ function App() {
     api.addNewCard({ name, link })
       .then((newCard) => {
         setCards([newCard, ...cards]);
-        hardCloseAllPopups();
       })
       .catch((err) => {
         console.log(err);
+        alert(`Ошибка: ${err}`);
+      }).finally(() => {
+        hardCloseAllPopups();
       });
+  }
+
+  function handleDeletePopupSubmit(card) {
+    api.deleteCard(card._id).then(() => {
+      // setCards((cardsState) => cardsState.filter((stateCard) => stateCard._id !== card._id));
+      const newCards = cards.filter((stateCard) => stateCard._id !== card._id);
+      setCards(newCards);
+    }).catch((err) => {
+      console.log(err);
+      alert(`Ошибка: ${err}`);
+    }).finally(() => {
+      hardCloseAllPopups();
+    });
   }
 
   useEffect(() => {
@@ -81,6 +106,7 @@ function App() {
       })
       .catch((err) => {
         console.log(err);
+        alert(`Ошибка: ${err}`);
       });
   }, []);
 
@@ -98,21 +124,6 @@ function App() {
     });
   }
 
-  function handleCardDelete(card) {
-    api.deleteCard(card._id).then(() => {
-      // setCards((cardsState) => cardsState.filter((stateCard) => stateCard._id !== card._id));
-      const newCards = cards.filter((stateCard) => stateCard._id !== card._id);
-      setCards(newCards)
-    });
-  }
-
-  function hardCloseAllPopups() {
-    setEditAvatarPopupOpen(false);
-    setEditProfilePopupOpen(false);
-    setAddPlacePopupOpen(false);
-    setSelectedCard(null);
-  }
-
   function closeAllPopups(event) {
     if (
       event.target.classList.contains('popup_active') ||
@@ -121,9 +132,39 @@ function App() {
       setEditAvatarPopupOpen(false);
       setEditProfilePopupOpen(false);
       setAddPlacePopupOpen(false);
+      setDeletePopupOpen(false);
       setSelectedCard(null);
     }
   }
+
+  function hardCloseAllPopups() {
+    setEditAvatarPopupOpen(false);
+    setEditProfilePopupOpen(false);
+    setAddPlacePopupOpen(false);
+    setDeletePopupOpen(false);
+    setSelectedCard(null);
+  }
+
+  const isOpen =
+    isAddPlacePopupOpen ||
+    isEditAvatarPopupOpen ||
+    isEditProfilePopupOpen ||
+    isDeletePopupOpen;
+
+  useEffect(() => {
+    function handleEscClose(event) {
+      if (event.key === 'Escape') {
+        hardCloseAllPopups();
+      }
+    }
+    if (isOpen) {
+      document.addEventListener('keydown', handleEscClose);
+      return () => {
+        document.removeEventListener('keydown', handleEscClose);
+      };
+    }
+  }, [isOpen]);
+
   return (
     <CurrentUserContext.Provider value={currentUser}>
       <div className='page'>
@@ -133,9 +174,9 @@ function App() {
           onEditProfile={handleEditProfileClick}
           onAddPlace={handleAddPlaceClick}
           onCardClick={handleCardClick}
+          onDeletePopup={handleDeletePopupClick}
           cards={cards}
           onCardLike={handleCardLike}
-          onCardDelete={handleCardDelete}
         />
         <Footer />
         <EditAvatarPopup
@@ -151,15 +192,14 @@ function App() {
         <AddPlacePopup
           isOpen={isAddPlacePopupOpen}
           onClose={closeAllPopups}
-          onAddPlace={handleAddPlaceSubmit} />
-        <PopupWithForm
-          name='delete'
-          title='Вы уверены?'
-          btnText='Да'
-          // isOpen={isDeletePopupOpen}
+          onAddPlace={handleAddPlaceSubmit}
+        />
+        <EditDeletePopup
+          isOpen={isDeletePopupOpen}
           onClose={closeAllPopups}
-        >
-        </PopupWithForm>
+          onDeletePopup={handleDeletePopupSubmit}
+          cardToDelete={cardToDelete}
+        />
         <ImagePopup
           card={selectedCard}
           onClose={closeAllPopups} />
