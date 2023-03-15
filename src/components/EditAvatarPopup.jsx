@@ -5,9 +5,9 @@ import { useRef } from 'react';
 
 function EditAvatarPopup({ isOpen, onClose, onUpdateAvatar }) {
     const inputAvatarRef = useRef();
+
     function handleSubmit(e) {
         e.preventDefault();
-
         onUpdateAvatar(inputAvatarRef.current.value);
     }
 

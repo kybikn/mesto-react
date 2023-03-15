@@ -9,6 +9,7 @@ import { CurrentUserContext } from '../contexts/CurrentUserContext';
 import avatarImage from '../images/Kusto.jpg';
 import EditProfilePopup from './EditProfilePopup';
 import EditAvatarPopup from './EditAvatarPopup';
+import AddPlacePopup from './AddPlacePopup';
 
 function App() {
   const [isAddPlacePopupOpen, setAddPlacePopupOpen] = useState(false);
@@ -34,11 +35,35 @@ function App() {
     setSelectedCard(card);
   }
 
+  function handleUpdateAvatar(link) {
+    api.editAvatar(link)
+      .then((profile) => {
+        // установка состояния профиля
+        setCurrentUser(profile);
+        hardCloseAllPopups();
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }
+
   function handleUpdateUser({ name, about }) {
     api.editProfile({ name, about })
       .then((profile) => {
         // установка состояния профиля
         setCurrentUser(profile);
+        hardCloseAllPopups();
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }
+
+
+  function handleAddPlaceSubmit({ name, link }) {
+    api.addNewCard({ name, link })
+      .then((newCard) => {
+        setCards([newCard, ...cards]);
         hardCloseAllPopups();
       })
       .catch((err) => {
@@ -58,20 +83,6 @@ function App() {
         console.log(err);
       });
   }, []);
-
-
-  function handleUpdateAvatar(link) {
-    api.editAvatar(link)
-      .then((profile) => {
-        // установка состояния профиля
-        setCurrentUser(profile);
-        hardCloseAllPopups();
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-  }
-
 
   function handleCardLike(card) {
     // Снова проверяем, есть ли уже лайк на этой карточке
@@ -137,44 +148,10 @@ function App() {
           onClose={closeAllPopups}
           onUpdateUser={handleUpdateUser}
         />
-        <PopupWithForm
-          name='place'
-          title='Новое место'
-          btnText='Создать'
+        <AddPlacePopup
           isOpen={isAddPlacePopupOpen}
           onClose={closeAllPopups}
-        >
-          <label className='popup__label'>
-            <span className='popup__input-close popup__input-place-close'>
-              &times;
-            </span>
-            <input
-              className='popup__input popup__input_type_place'
-              id='popup__input-place'
-              type='text'
-              name='place'
-              placeholder='Название'
-              minLength='2'
-              maxLength='30'
-              required
-            />
-            <span className='popup__input-error popup__input-place-error'></span>
-          </label>
-          <label className='popup__label'>
-            <span className='popup__input-close popup__input-url-close'>
-              &times;
-            </span>
-            <input
-              className='popup__input popup__input_type_link'
-              id='popup__input-url'
-              type='url'
-              name='url'
-              placeholder='Ссылка на картинку'
-              required
-            />
-            <span className='popup__input-error popup__input-url-error'></span>
-          </label>
-        </PopupWithForm>
+          onAddPlace={handleAddPlaceSubmit} />
         <PopupWithForm
           name='delete'
           title='Вы уверены?'
