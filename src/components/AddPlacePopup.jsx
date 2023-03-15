@@ -12,6 +12,9 @@ function AddPlacePopup({ isOpen, onClose, onAddPlace }) {
         });
     }
 
+    inputNameRef.current.value = '';
+    inputLinkrRef.current.value = '';
+
     return (
         <PopupWithForm
             name='place'
