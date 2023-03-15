@@ -1,43 +1,20 @@
-import avatarImage from '../images/Kusto.jpg';
-import { useState, useEffect } from 'react';
-import api from '../utils/api.js';
+
+import { useContext } from 'react';
 import Card from './Card';
-import enrichCardData from '../utils/utils.js'
+import { CurrentUserContext } from '../contexts/CurrentUserContext';
 
-function Main({ onEditAvatar, onEditProfile, onAddPlace, onCardClick }) {
-  const [userName, setUserName] = useState('Жак-Ив Кусто');
-  const [userDescription, setUserDescription] = useState(
-    'Исследователь океана'
-  );
-  const [userAvatar, setUserAvatar] = useState(avatarImage);
-  const [cards, setCards] = useState([]);
+function Main({ onEditAvatar, onEditProfile, onAddPlace, onCardClick, onDeletePopup, cards, onCardLike }) {
 
-  useEffect(() => {
-    Promise.all([api.getProfile(), api.getInitialCards()])
-      // тут деструктурируем ответ от сервера (api.getProfile() => profile, api.getInitialCards() => initialCards)
-      .then(([profile, initialCards]) => {
-        // установка состояния профиля и перерисовка, соответственно
-        setUserAvatar(profile.avatar);
-        setUserName(profile.name);
-        setUserDescription(profile.about);
-
-        // обогащение данных карточек
-        const enrichedInitialCards = initialCards.map((cardData) =>
-          enrichCardData(cardData, profile._id)
-        );
-        // установка состояния карточек и перерисовка, соответственно
-        setCards(enrichedInitialCards);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-  }, []);
+  const currentUser = useContext(CurrentUserContext);
 
   const galleryList = cards.map((card) =>
     <Card
       key={card._id}
       card={card}
-      onCardClick={onCardClick} />
+      onCardClick={onCardClick}
+      onDeletePopup={onDeletePopup}
+      onCardLike={onCardLike}
+    />
   );
 
   return (
@@ -54,20 +31,20 @@ function Main({ onEditAvatar, onEditProfile, onAddPlace, onCardClick }) {
             ></button>
             <img
               className='profile__img profile__avatar-img'
-              src={userAvatar}
+              src={currentUser.avatar}
               alt='Аватар'
             />
           </div>
           <div className='profile__text'>
             <div className='profile__name'>
-              <h1 className='profile__title'>{userName}</h1>
+              <h1 className='profile__title'>{currentUser.name}</h1>
               <button
                 onClick={onEditProfile}
                 className='button profile__button-edit'
                 type='button'
               ></button>
             </div>
-            <p className='profile__subtitle'>{userDescription}</p>
+            <p className='profile__subtitle'>{currentUser.about}</p>
           </div>
           <button
             onClick={onAddPlace}
