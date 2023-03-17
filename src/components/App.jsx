@@ -1,7 +1,6 @@
 import Header from './Header';
 import Main from './Main';
 import Footer from './Footer';
-// import PopupWithForm from './PopupWithForm';
 import ImagePopup from './ImagePopup';
 import { useEffect, useState } from 'react';
 import api from '../utils/api.js';
@@ -10,7 +9,7 @@ import avatarImage from '../images/Kusto.jpg';
 import EditProfilePopup from './EditProfilePopup';
 import EditAvatarPopup from './EditAvatarPopup';
 import AddPlacePopup from './AddPlacePopup';
-import EditDeletePopup from './EditDeletePopup';
+import DeletePopup from './DeletePopup';
 
 
 function App() {
@@ -85,7 +84,6 @@ function App() {
 
   function handleDeletePopupSubmit(card) {
     api.deleteCard(card._id).then(() => {
-      // setCards((cardsState) => cardsState.filter((stateCard) => stateCard._id !== card._id));
       const newCards = cards.filter((stateCard) => stateCard._id !== card._id);
       setCards(newCards);
     }).catch((err) => {
@@ -114,14 +112,15 @@ function App() {
     // Снова проверяем, есть ли уже лайк на этой карточке
     const isLiked = card.likes.some(i => i._id === currentUser._id);
     // Отправляем запрос в API и получаем обновлённые данные карточки
-    // api.changeLikeCardStatus(card._id, !isLiked).then((newCard) => {
-    //   setCards((state) => state.map((stateCard) => stateCard._id === card._id ? newCard : stateCard));
-    // });
-    api.changeLikeCardStatus(card._id, !isLiked).then((newCard) => {
-      // setCards((cardsState) => cardsState.map((stateCard) => stateCard._id === card._id ? newCard : stateCard));
-      const newCards = cards.map(stateCard => stateCard._id === card._id ? newCard : stateCard)
-      setCards(newCards)
-    });
+    api.changeLikeCardStatus(card._id, !isLiked)
+      .then((newCard) => {
+        const newCards = cards.map(stateCard => stateCard._id === card._id ? newCard : stateCard)
+        setCards(newCards)
+      })
+      .catch((err) => {
+        console.log(err);
+        alert(`Ошибка: ${err}`);
+      });
   }
 
   function closeAllPopups(event) {
@@ -149,7 +148,8 @@ function App() {
     isAddPlacePopupOpen ||
     isEditAvatarPopupOpen ||
     isEditProfilePopupOpen ||
-    isDeletePopupOpen;
+    isDeletePopupOpen ||
+    selectedCard;
 
   useEffect(() => {
     function handleEscClose(event) {
@@ -194,7 +194,7 @@ function App() {
           onClose={closeAllPopups}
           onAddPlace={handleAddPlaceSubmit}
         />
-        <EditDeletePopup
+        <DeletePopup
           isOpen={isDeletePopupOpen}
           onClose={closeAllPopups}
           onDeletePopup={handleDeletePopupSubmit}
