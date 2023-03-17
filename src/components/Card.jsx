@@ -41,7 +41,10 @@ function Card({ card, onCardClick, onCardLike, onDeletePopup }) {
                     setImageExist(false);
                 }
             })
-            .catch((err) => console.log(err));
+            .catch((err) => {
+                console.log(err);
+                alert(`Ошибка: ${err}`);
+            })
     }, [card.link, card.name]);
 
     return (
