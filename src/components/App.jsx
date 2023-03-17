@@ -50,7 +50,7 @@ function App() {
         console.log(err);
         alert(`Ошибка: ${err}`);
       }).finally(() => {
-        hardCloseAllPopups();
+        closeAllPopups();
       });
   }
 
@@ -64,7 +64,7 @@ function App() {
         console.log(err);
         alert(`Ошибка: ${err}`);
       }).finally(() => {
-        hardCloseAllPopups();
+        closeAllPopups();
       });
   }
 
@@ -78,7 +78,7 @@ function App() {
         console.log(err);
         alert(`Ошибка: ${err}`);
       }).finally(() => {
-        hardCloseAllPopups();
+        closeAllPopups();
       });
   }
 
@@ -90,7 +90,7 @@ function App() {
       console.log(err);
       alert(`Ошибка: ${err}`);
     }).finally(() => {
-      hardCloseAllPopups();
+      closeAllPopups();
     });
   }
 
@@ -125,6 +125,7 @@ function App() {
 
   function closeAllPopups(event) {
     if (
+      !event ||
       event.target.classList.contains('popup_active') ||
       event.target.classList.contains('popup__close')
     ) {
@@ -136,14 +137,6 @@ function App() {
     }
   }
 
-  function hardCloseAllPopups() {
-    setEditAvatarPopupOpen(false);
-    setEditProfilePopupOpen(false);
-    setAddPlacePopupOpen(false);
-    setDeletePopupOpen(false);
-    setSelectedCard(null);
-  }
-
   const isOpen =
     isAddPlacePopupOpen ||
     isEditAvatarPopupOpen ||
@@ -152,9 +145,10 @@ function App() {
     selectedCard;
 
   useEffect(() => {
+    //  для меня этот функционал идеологически относится к приложению. Я готова закрывать по esc все окна! :)
     function handleEscClose(event) {
       if (event.key === 'Escape') {
-        hardCloseAllPopups();
+        closeAllPopups();
       }
     }
     if (isOpen) {
