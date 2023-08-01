@@ -24,3 +24,28 @@
 - Flexbox
 - JavaScript
 - ReactJS
+
+## Установка:
+1. Клонировать репозиторий:
+
+````
+git clone https://github.com/kybikn/express-mesto-gha.git
+````
+
+2. Установить зависимости:
+
+````
+npm install
+````
+    
+3. Собрать билд:
+
+````
+npm run build
+````
+    
+4. Запустить на локальном сервере:
+
+````
+npm run start
+````
