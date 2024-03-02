@@ -1,12 +1,8 @@
-# Веб-приложение "Mesto"
-## Сайт:
-[Click here!](https://kybikn.github.io/mesto-react/)
+# Веб-приложение "Mesto" 2
+### Сайт:  [Click here!](https://mesto.kybikn.ru/)
 
-## Нативный проект "Mesto":
-[Click here!](https://kybikn.github.io/mesto/)
+### Макет:  [Click here!](https://www.figma.com/file/5H3gsn5lIGPwzBPby9jAOo/JavaScript.-Sprint-12?node-id=0%3A1&mode=dev)
 
-## Макет: 
-[Click here!](https://www.figma.com/file/5H3gsn5lIGPwzBPby9jAOo/JavaScript.-Sprint-12?node-id=0%3A1&mode=dev)
 
 ## Описание:
 **"Mesto"** - веб-приложение, где пользователи могут создавать фотокарточки и делиться ими.<br>
@@ -16,6 +12,7 @@
   - Изменение аватарки и данных своего профиля.
   - Возможность видеть пользовательские фотокарточки, создавать и удалять свои.
   - Возможность видеть пользовательские лайки, ставить и удалять свои.
+
 
 ## Технологии:
 - HTML5 / CSS3
